@@ -1,0 +1,278 @@
+[
+    {
+        "id": "3aaab521c83ab191",
+        "type": "tab",
+        "label": "Fluxo 1",
+        "disabled": false,
+        "info": "",
+        "env": []
+    },
+    {
+        "id": "7d5d0609e95ba706",
+        "type": "tab",
+        "label": "CNC",
+        "disabled": false,
+        "info": "",
+        "env": []
+    },
+    {
+        "id": "d7b664f651c9fea4",
+        "type": "serial-port",
+        "name": "RS232",
+        "serialport": "COM6",
+        "serialbaud": "115200",
+        "databits": "8",
+        "parity": "none",
+        "stopbits": "1",
+        "waitfor": "",
+        "dtr": "none",
+        "rts": "none",
+        "cts": "none",
+        "dsr": "none",
+        "newline": "\\n",
+        "bin": "false",
+        "out": "char",
+        "addchar": "",
+        "responsetimeout": "10000"
+    },
+    {
+        "id": "90aa20814c0af329",
+        "type": "MySQLdatabase",
+        "name": "mydb2",
+        "host": "localhost",
+        "port": "3306",
+        "db": "mydb2",
+        "tz": "hh:mm",
+        "charset": "UTF8"
+    },
+    {
+        "id": "395052b9388fb7ba",
+        "type": "function",
+        "z": "7d5d0609e95ba706",
+        "name": "TrataDados",
+        "func": "try{\n    let dados = msg.payload.split(\"|\");\n    let status = dados[0].substring(1);\n\n    // lê posições\n    let dadosPos = dados[1].split(\":\");\n    dadosPos = dadosPos[1].split(\",\");\n\n    let x = dadosPos[0];\n    let y = dadosPos[1];\n    let z = dadosPos[2];\n\n    // lê feed rate e spindle\n    let dadosRateSpindle = dados[2].split(\":\");\n    dadosRateSpindle = dadosRateSpindle[1].split(\",\");\n    let feedRate = dadosRateSpindle[0];\n    let spindle = dadosRateSpindle[1];\n\n    //let dadosJSON = JSON.parse('{\"status\":\"' + status + '\",\"x\":' + x + ',\"y\":' + y + ',\"z\":' + z + ',\"feedRate\":' + feedRate + ',\"spindle\":' + spindle + '}');  \n    let dadosJSON = JSON.parse('{\"status\":\"' + status + '\", \"x\":' + x + ',\"y\":' + y + ', \"z\":' + z + ', \"feedRate\":' + feedRate + ',\"spindle\":' + spindle + '}');\n    msg.payload = dadosJSON;\n}\ncatch (err){\n    return null;\n}\n// Criar um objeto Date, que representará a data e hora atuais\nlet dataAtual = new Date();\n// Obter o ano\nlet ano = dataAtual.getFullYear();\n// Obter o mês (vale lembrar que os meses são indexados de 0 a 11)\nlet mes = dataAtual.getMonth() + 1; // Adicionamos 1 para que janeiro seja 1, fevereiro seja 2, etc.\n// Obter o dia do mês\nlet dia = dataAtual.getDate();\n// Obter as horas\nlet horas = dataAtual.getHours();\n// Obter os minutos\nlet minutos = dataAtual.getMinutes();\n// Obter os segundos\nlet segundos = dataAtual.getSeconds();\n\nlet dataFormatada = ano + '-' + mes + '-' + dia; // Formato ISO 8601 para data\nlet horaFormatada = horas + ':' + minutos + ':' + segundos; // Formato HH:MM:SS\nmsg.topic = `INSERT INTO cnc (posX, posY, posZ, feedRate, spidle, data, hora) VALUES (${msg.payload.x}, ${msg.payload.y}, ${msg.payload.z}, ${msg.payload.feedRate}, ${msg.payload.spindle}, '${dataFormatada}', '${horaFormatada}');`;\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 430,
+        "y": 360,
+        "wires": [
+            [
+                "41ed7bee2004644f",
+                "1bb3f7ab2f7cdf4f",
+                "a4ec21f70a098fde"
+            ]
+        ]
+    },
+    {
+        "id": "41ed7bee2004644f",
+        "type": "function",
+        "z": "7d5d0609e95ba706",
+        "name": "AttDados",
+        "func": "flow.set(\"dadosGlobais\",msg.payload);\nreturn null;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 660,
+        "y": 360,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "ca9c2425c503c48e",
+        "type": "inject",
+        "z": "7d5d0609e95ba706",
+        "name": "VariaveisGlobais",
+        "props": [],
+        "repeat": "",
+        "crontab": "",
+        "once": true,
+        "onceDelay": 0.1,
+        "topic": "",
+        "x": 270,
+        "y": 260,
+        "wires": [
+            [
+                "4baa262009471fc7"
+            ]
+        ]
+    },
+    {
+        "id": "4baa262009471fc7",
+        "type": "change",
+        "z": "7d5d0609e95ba706",
+        "name": "dadosGlobais",
+        "rules": [
+            {
+                "t": "set",
+                "p": "dadosGlobais",
+                "pt": "flow",
+                "to": "",
+                "tot": "str"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 600,
+        "y": 260,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "1bb3f7ab2f7cdf4f",
+        "type": "debug",
+        "z": "7d5d0609e95ba706",
+        "name": "debug 1",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "false",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 800,
+        "y": 300,
+        "wires": []
+    },
+    {
+        "id": "27a8e881b17142ca",
+        "type": "http in",
+        "z": "7d5d0609e95ba706",
+        "name": "",
+        "url": "/cnc",
+        "method": "get",
+        "upload": false,
+        "swaggerDoc": "",
+        "x": 200,
+        "y": 460,
+        "wires": [
+            [
+                "7392b84a6e1a73bd"
+            ]
+        ]
+    },
+    {
+        "id": "7392b84a6e1a73bd",
+        "type": "function",
+        "z": "7d5d0609e95ba706",
+        "name": "apiDadosCNC",
+        "func": "msg.payload = flow.get(\"dadosGlobais\");\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 440,
+        "y": 460,
+        "wires": [
+            [
+                "db734b6c2bf50614"
+            ]
+        ]
+    },
+    {
+        "id": "db734b6c2bf50614",
+        "type": "http response",
+        "z": "7d5d0609e95ba706",
+        "name": "",
+        "statusCode": "",
+        "headers": {},
+        "x": 710,
+        "y": 460,
+        "wires": []
+    },
+    {
+        "id": "dd1d1b98b54bcd78",
+        "type": "inject",
+        "z": "7d5d0609e95ba706",
+        "name": "",
+        "props": [],
+        "repeat": "0.1",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "x": 230,
+        "y": 620,
+        "wires": [
+            [
+                "77b368595a673529"
+            ]
+        ]
+    },
+    {
+        "id": "77b368595a673529",
+        "type": "function",
+        "z": "7d5d0609e95ba706",
+        "name": "LeStatus",
+        "func": "\nlet dados = flow.get(\"dadosGlobais\");\nlet status = dados.status;\n\nswitch (status) {\n\n    case \"Idle\":\n        msg.payload = \"Idle\";\n        msg.topic = \"INSERT INTO cnc (statusMaq) VALUES ('Parado');\"\n        break;\n    case \"Check\":\n        msg.payload = \"Check\";\n        msg.topic = \"INSERT INTO cnc (statusMaq) VALUES ('Check');\"\n        break;\n    case \"Run\":\n        msg.payload = \"Run\";\n        msg.topic = \"INSERT INTO cnc (statusMaq) VALUES ('Rodando');\"\n        break;\n    default:\n        msg.payload = \"N/A\";\n        msg.topic = \"INSERT INTO cnc (statusMaq) VALUES ('Desconectado');\"\n}\n\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 420,
+        "y": 620,
+        "wires": [
+            [
+                "80e5f12adbb14ae7",
+                "a4ec21f70a098fde"
+            ]
+        ]
+    },
+    {
+        "id": "2e525eb48556fea5",
+        "type": "serial in",
+        "z": "7d5d0609e95ba706",
+        "name": "CNC",
+        "serial": "d7b664f651c9fea4",
+        "x": 210,
+        "y": 360,
+        "wires": [
+            [
+                "395052b9388fb7ba"
+            ]
+        ]
+    },
+    {
+        "id": "80e5f12adbb14ae7",
+        "type": "debug",
+        "z": "7d5d0609e95ba706",
+        "name": "debug 2",
+        "active": false,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "false",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 740,
+        "y": 560,
+        "wires": []
+    },
+    {
+        "id": "a4ec21f70a098fde",
+        "type": "mysql",
+        "z": "7d5d0609e95ba706",
+        "mydb": "90aa20814c0af329",
+        "name": "DataBaseSQL",
+        "x": 740,
+        "y": 620,
+        "wires": [
+            []
+        ]
+    }
+]
