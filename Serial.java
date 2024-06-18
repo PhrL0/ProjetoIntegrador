@@ -5,15 +5,15 @@ import java.nio.charset.StandardCharsets;
 import com.fazecast.jSerialComm.SerialPort;
 
 public class Serial {
-	// buffer para recepÃ§Ã£o e envio de dados
+	// buffer para recepção e envio de dados
 	byte[] readBuffer = new byte[2048];
 	byte[] outputMessage = "".getBytes(StandardCharsets.UTF_8);
 	
-	// portas COM disponÃ­veis
+	// portas COM disponíveis
 	SerialPort[] ports = SerialPort.getCommPorts();
 	SerialPort serialPort;	
 
-	// retorna um Array de String com as portas disponÃ­veis
+	// retorna um Array de String com as portas disponíveis
 	public String[] listaCom() {
 		String[] comPort = new String[ports.length];
 		if (ports.length == 0) {
